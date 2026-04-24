@@ -1,0 +1,66 @@
+# P5 — Filtered Baseline Target
+# =============================
+# A plainly-firewalled honeypot. A fixed subset of ports are DROP-filtered
+# (nmap sees "filtered"); the rest are exposed normally.
+#
+# Purpose: sanity control for the experiment. All three arms should produce
+# identical results on P5. If they don't, the scan harness has a bug.
+#
+# Local usage:
+#   docker compose up --build -d
+
+services:
+  gatekeeper:
+    build:
+      context: ./gatekeeper
+      dockerfile: Dockerfile
+    container_name: p5-gatekeeper
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "iptables -L P5_FILTERED -n >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  honeypot:
+    build:
+      context: ../../honeypot
+      dockerfile: Dockerfile
+    container_name: p5-honeypot
+    depends_on:
+      gatekeeper:
+        condition: service_healthy
+    volumes:
+      - ../../honeypot/configs:/configs:ro
+      - honeypot_logs:/logs
+    environment:
+      CONFIG_DIR: /configs
+      LOG_DIR: /logs
+      LOG_LEVEL: info
+      TCP_ENABLED: "true"
+      SSL_ENABLED: "true"
+    ports:
+      - "8180:80"
+      - "8280:8080"
+      - "8443:443"
+      - "8444:8443"
+      - "8122:22"
+      - "8123:23"
+      - "8125:25"
+      - "8465:465"
+      - "8587:587"
+      - "8145:445"
+      - "8541:541"
+      - "9999:9999"
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+
+volumes:
+  honeypot_logs:

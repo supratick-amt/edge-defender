@@ -1,0 +1,22 @@
+id: TEST-VHOST
+name: "Vhost routing test"
+protocol: http
+port: 80
+http:
+  routes:
+    - method: ANY
+      path: /
+      host: app1.honeypot.local
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Vhost: "app1"
+        body: "app1-content-marker"
+    - method: ANY
+      path: /
+      host: app2.honeypot.local
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Vhost: "app2"
+        body: "app2-content-marker"

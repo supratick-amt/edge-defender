@@ -1,0 +1,13 @@
+id: TEST-HTTP-8080
+name: "HTTP alt port test endpoint"
+protocol: http
+port: 8080
+http:
+  routes:
+    - method: ANY
+      path: /
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Test: "http-8080"
+        body: "HTTP 8080 OK"

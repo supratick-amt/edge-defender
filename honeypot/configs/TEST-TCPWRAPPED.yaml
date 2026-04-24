@@ -1,0 +1,10 @@
+id: TEST-TCPWRAPPED
+name: Test tcpwrapped port behavior
+protocol: tcp
+port: 9999
+
+tcp:
+  # tcpwrapped: complete the TCP handshake then close with no data exchange.
+  # Nmap reports such ports as service "tcpwrapped".
+  # Used to validate T1898 nmap parser handling of tcpwrapped service entries.
+  tcpwrapped: true

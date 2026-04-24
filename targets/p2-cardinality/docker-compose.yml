@@ -1,0 +1,12 @@
+# P2 — Cardinality-Based Blocker *(NOT IMPLEMENTED)*
+# ====================================================
+# This compose file is a placeholder. The gatekeeper is not yet built.
+# See README.md for the implementation plan.
+#
+# To spin a target for testing, use P1 or P5 for now.
+
+services:
+  not_implemented:
+    image: alpine:3.19
+    command: >
+      sh -c "echo 'P2 gatekeeper not implemented yet. See targets/p2-cardinality/README.md' && exit 1"

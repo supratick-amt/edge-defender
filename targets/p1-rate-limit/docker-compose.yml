@@ -1,0 +1,74 @@
+# P1 — Rate-Limited Target
+# ========================
+# Gatekeeper applies iptables hashlimit (~20 probes/sec per source IP).
+# Honeypot runs unchanged behind it.
+#
+# The gatekeeper runs in host network mode with NET_ADMIN so its iptables rules
+# affect inbound traffic at the host level, filtering probes before they reach
+# the honeypot container.
+#
+# Local usage:
+#   docker compose up --build -d
+#
+# Reset:
+#   docker compose down && docker compose up --build -d
+
+services:
+  gatekeeper:
+    build:
+      context: ./gatekeeper
+      dockerfile: Dockerfile
+    container_name: p1-gatekeeper
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    restart: unless-stopped
+    # Healthcheck confirms iptables rules are installed.
+    healthcheck:
+      test: ["CMD-SHELL", "iptables -L P1_RATE_LIMIT -n >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  honeypot:
+    build:
+      context: ../../honeypot
+      dockerfile: Dockerfile
+    container_name: p1-honeypot
+    depends_on:
+      gatekeeper:
+        condition: service_healthy
+    volumes:
+      - ../../honeypot/configs:/configs:ro
+      - honeypot_logs:/logs
+    environment:
+      CONFIG_DIR: /configs
+      LOG_DIR: /logs
+      LOG_LEVEL: info
+      TCP_ENABLED: "true"
+      SSL_ENABLED: "true"
+    # Honeypot binds the full set of CVE ports. On AWS these are exposed
+    # directly on the instance IP. Locally they're remapped to high ports
+    # (see docker-compose.local.yml override or scripts/local-up.sh).
+    ports:
+      - "8180:80"     # HTTP
+      - "8280:8080"   # HTTP alt
+      - "8443:443"    # HTTPS
+      - "8444:8443"   # HTTPS alt
+      - "8122:22"     # SSH
+      - "8123:23"     # Telnet
+      - "8125:25"     # SMTP
+      - "8465:465"    # SMTP/TLS
+      - "8587:587"    # SMTP submission
+      - "8145:445"    # SMB
+      - "8541:541"    # Fortinet FGFM
+      - "9999:9999"   # tcpwrapped test
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+
+volumes:
+  honeypot_logs:

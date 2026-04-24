@@ -1,0 +1,30 @@
+id: TEST-VHOST-HTTPS
+name: "Vhost HTTPS routing test"
+protocol: https
+port: 443
+https:
+  cert_cn: honeypot.local
+  cert_org: "Honeypot Lab"
+  cert_sans:
+    - honeypot.local
+    - honeypot
+    - app1.honeypot.local
+    - app2.honeypot.local
+    - localhost
+  routes:
+    - method: ANY
+      path: /
+      host: app1.honeypot.local
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Vhost: "app1"
+        body: "app1-https-content-marker"
+    - method: ANY
+      path: /
+      host: app2.honeypot.local
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Vhost: "app2"
+        body: "app2-https-content-marker"

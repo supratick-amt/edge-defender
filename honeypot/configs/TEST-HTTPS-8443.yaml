@@ -1,0 +1,19 @@
+id: TEST-HTTPS-8443
+name: "HTTPS alt port test endpoint"
+protocol: https
+port: 8443
+https:
+  cert_cn: honeypot.local
+  cert_org: "Honeypot Lab"
+  cert_sans:
+    - honeypot.local
+    - honeypot
+    - localhost
+  routes:
+    - method: ANY
+      path: /
+      response:
+        status: 200
+        headers:
+          X-Honeypot-Test: "https-8443"
+        body: "HTTPS 8443 OK"

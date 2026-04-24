@@ -1,0 +1,9 @@
+# P4 — WAF-Fronted HTTP *(NOT IMPLEMENTED)*
+# ==========================================
+# Placeholder. See README.md for the implementation plan.
+
+services:
+  not_implemented:
+    image: alpine:3.19
+    command: >
+      sh -c "echo 'P4 gatekeeper not implemented yet. See targets/p4-waf/README.md' && exit 1"
