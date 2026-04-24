@@ -69,9 +69,3 @@ Default: hourly cron on each target instance runs `scripts/reset.sh`. For precis
 
 See `docs/operations.md` for details.
 
-## Open items
-
-- DevOps team owns AWS infra (EC2 provisioning, DNS, IAM). Terraform is not in this repo.
-- Honeypot is currently built from source via submodule. If the honeypot project publishes a pre-built image, compose files will be updated to pull instead of build.
-- P2/P3/P4 gatekeeper implementations pending.
-- Stretch goal: one real WAF target on Cloudflare Pro — pending pricing approval.
